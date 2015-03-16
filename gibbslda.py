@@ -142,44 +142,6 @@ class LdaSampler(object):
     p_z /= np.sum(p_z)
     return p_z
 
-  def loglikelihood_word(self):
-    """
-    Compute the likelihood that the model generated the text data.
-    """
-    global vocab_size
-    global n_users
-    lik = 0
-
-    for z in xrange(self.n_topics):
-      lik += log_multi_beta(self.beta + self.nzw[z, :])
-      lik -= log_multi_beta(self.beta, vocab_size)
-
-    for m in xrange(n_users):
-      lik += log_multi_beta(
-        self.alpha + self.nzm[:, m] + self.nrz[m, :] + self.nmz[m, :])
-      lik -= log_multi_beta(self.alpha, self.n_topics)
-
-    return lik
-
-  def loglikelihood_follower(self):
-    """
-    Compute the likelihood that the model generated the user data.
-    """
-    global vocab_size
-    global n_users
-    lik = 0
-
-    for z in xrange(self.n_topics):
-      lik += log_multi_beta(self.gamma + self.nzm[z, :])
-      lik -= log_multi_beta(self.gamma, n_users)
-
-    for m in xrange(n_users):
-      lik += 2 * log_multi_beta(
-        self.alpha + self.nzm[:, m] + self.nrz[m, :] + self.nmz[m, :])
-      lik -= 2 * log_multi_beta(self.alpha, self.n_topics)
-
-    return lik
-
   def phi(self):
     """
     Compute phi = p(w|z).
@@ -249,7 +211,7 @@ if __name__ == "__main__":
   import shutil
 
   N_TOPICS = 100
-  NUM_ITER = 500
+  NUM_ITER = 100
   FOLDER = "topic"
   TOP_K = 40
   RECORD_FREQUENCY = 5
@@ -269,8 +231,6 @@ if __name__ == "__main__":
 
   for it, (phi, sigma) in enumerate(sampler.run(text_matrix, user_matrix, NUM_ITER)):
     print "Iteration", it * RECORD_FREQUENCY
-    # print "Likelihood Word", sampler.loglikelihood_word()
-    # print "Likelihood Follower", sampler.loglikelihood_follower()
 
     top_sorted_items = np.empty((N_TOPICS, TOP_K))
     top_sorted_prob = np.empty((N_TOPICS, TOP_K))

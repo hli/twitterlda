@@ -1,3 +1,4 @@
+Run order:
 0) preprocessData.py
 1) text_mapping_pickler.py
 2) text_matrix_pickler.py
